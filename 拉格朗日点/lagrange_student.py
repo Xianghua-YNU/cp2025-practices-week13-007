@@ -31,9 +31,7 @@ def lagrange_equation(r):
     # TODO: 实现L1点位置方程 (约5行代码)
     # [STUDENT_CODE_HERE]
     # 提示: 方程应该包含地球引力、月球引力和离心力的平衡关系
-    
-    raise NotImplementedError("请在 {} 中实现此函数。".format(__file__))
-    
+    equation_value = (G*M)/(r**2) - (G*m)/((R - r)**2) - (omega**2)*r
     return equation_value
 
 
@@ -50,9 +48,7 @@ def lagrange_equation_derivative(r):
     # TODO: 实现L1点位置方程的导数 (约5-10行代码)
     # [STUDENT_CODE_HERE]
     # 提示: 对lagrange_equation函数求导
-    
-    raise NotImplementedError("请在 {} 中实现此函数。".format(__file__))
-    
+    derivative_value = -2*G*M/(r**3) - 2*(G*m)/((R - r)**3) - omega**2
     return derivative_value
 
 
@@ -73,9 +69,19 @@ def newton_method(f, df, x0, tol=1e-8, max_iter=100):
     # TODO: 实现牛顿法 (约15行代码)
     # [STUDENT_CODE_HERE]
     # 提示: 迭代公式为 x_{n+1} = x_n - f(x_n)/df(x_n)
-    
-    raise NotImplementedError("请在 {} 中实现此函数。".format(__file__))
-    
+    x = x0
+    iterations = 0
+    converged = False
+    for i in range(max_iter):
+        if abs(f(x)) < tol:      #如果f(x)=0,结束循环
+            iterations = i + 1
+            converged = True
+            break
+        if abs(df(x)) < 1e-14:     #分母不能为零
+            break
+        x1 = x -f(x)/df(x)
+        x = x1
+        iterations = i + 1
     return x, iterations, converged
 
 
@@ -96,10 +102,28 @@ def secant_method(f, a, b, tol=1e-8, max_iter=100):
     # TODO: 实现弦截法 (约15行代码)
     # [STUDENT_CODE_HERE]
     # 提示: 迭代公式为 x_{n+1} = x_n - f(x_n)*(x_n-x_{n-1})/(f(x_n)-f(x_{n-1}))
-    
-    raise NotImplementedError("请在 {} 中实现此函数。".format(__file__))
-    
-    return x, iterations, converged
+    if abs(f(a)) < tol:
+        return a, 0, True
+    if abs(f(b)) < tol:
+        return b, 0, True
+    iterations = 0
+    converged = False
+    x1,x2 = a,b
+    f1,f2 = f(a),f(b)
+    for i in range(max_iter):
+        if abs(f1 - f2) < tol:   #除数不能为零
+            break
+        x3 = x2 -f2*(x2 - x1)/(f2 - f1)
+        f3 = f(x3)
+        if abs(f3) < tol:
+            iterations = i + 1
+            converged = True
+            x2 = x3
+            break
+        x1,x2 = x2,x3
+        f1,f2 = f2,f3
+        iterations = i + 1
+    return x2, iterations, converged
 
 
 def plot_lagrange_equation(r_min, r_max, num_points=1000):
@@ -117,9 +141,26 @@ def plot_lagrange_equation(r_min, r_max, num_points=1000):
     # TODO: 实现绘制方程图像的代码 (约15行代码)
     # [STUDENT_CODE_HERE]
     # 提示: 在合适的范围内绘制函数图像，标记零点位置
-    
-    raise NotImplementedError("请在 {} 中实现此函数。".format(__file__))
-    
+    # 生成r值数组
+    r_values = np.linspace(r_min, r_max, num_points)
+    # 计算对应函数值
+    f_values = [lagrange_equation(r) for r in r_values]
+    # 创建图形和坐标轴
+    fig, ax = plt.subplots(figsize=(10, 6))
+    ax.plot(r_values, f_values, label='L1 Equation')
+    ax.axhline(0, color='gray', linestyle='--', linewidth=0.8)
+    # 使用弦截法寻找零点
+    root, iterations, converged = secant_method(lagrange_equation, r_min, r_max)
+    # 标记零点位置
+    if converged:
+        ax.scatter(root, 0, color='red', s=50, zorder=5, 
+                  label=f'L1 Point ({root:.2e} m)')
+    # 添加图形元素
+    ax.set_xlabel('Distance from Earth [m]', fontsize=12)
+    ax.set_ylabel('Equation Value', fontsize=12)
+    ax.set_title('Earth-Moon L1 Lagrange Point Equation', fontsize=14)
+    ax.grid(True, alpha=0.3)
+    ax.legend()
     return fig
 
 
