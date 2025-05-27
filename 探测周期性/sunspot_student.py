@@ -21,7 +21,9 @@ def load_sunspot_data(url):
     """
     # TODO: 使用np.loadtxt读取数据，只保留第2(年份)和3(太阳黑子数)列
     # [STUDENT_CODE_HERE]
-    raise NotImplementedError("请在 {} 中实现此函数".format(__file__))
+    data = np.loadtxt(r"C:\Users\35281\Desktop\计算物理\cp2025-practices-week13-007-main\sunspot_data.txt",usecols=(2,3),comments='#')
+    years = data[:,0]
+    sunspots = data[:,1]
     return years, sunspots
 
 def plot_sunspot_data(years, sunspots):
@@ -34,7 +36,13 @@ def plot_sunspot_data(years, sunspots):
     """
     # TODO: 实现数据可视化
     # [STUDENT_CODE_HERE]
-    raise NotImplementedError("请在 {} 中实现此函数".format(__file__))
+    plt.figure()
+    plt.plot(years,sunspots)
+    plt.xlabel('Year')
+    plt.ylabel('Sunspot Number')
+    plt.title('Sunspot Number Variation (1749-Present)')
+    plt.grid(True)
+    plt.show()
 
 def compute_power_spectrum(sunspots):
     """
@@ -48,7 +56,10 @@ def compute_power_spectrum(sunspots):
     """
     # TODO: 实现傅里叶变换和功率谱计算
     # [STUDENT_CODE_HERE]
-    raise NotImplementedError("请在 {} 中实现此函数".format(__file__))
+    n = sunspots.size
+    fft_sunspots = np.fft.fft(sunspots)
+    frequencies = np.fft.fftfreq(n, d=1)[:n//2]  # 每月采样一次,只保留正频率部分
+    power = np.abs(fft_sunspots[:n//2])**2      #保留正频率部分
     return frequencies, power
 
 def plot_power_spectrum(frequencies, power):
@@ -61,7 +72,13 @@ def plot_power_spectrum(frequencies, power):
     """
     # TODO: 实现功率谱可视化
     # [STUDENT_CODE_HERE]
-    raise NotImplementedError("请在 {} 中实现此函数".format(__file__))
+    plt.figure()
+    plt.plot(1/frequencies[1:],power[1:])
+    plt.xlabel('Period')
+    plt.ylabel('power')
+    plt.title('Power Spectrum of Sunspot Data')
+    plt.grid(True)
+    plt.show()
 
 def find_main_period(frequencies, power):
     """
@@ -76,7 +93,14 @@ def find_main_period(frequencies, power):
     """
     # TODO: 实现主周期检测
     # [STUDENT_CODE_HERE]
-    raise NotImplementedError("请在 {} 中实现此函数".format(__file__))
+    # 排除直流分量（索引0），只关注k>=1的频率分量
+    relevant_power = power[1:]
+    relevant_freqs = frequencies[1:]
+    # 找到最大功率对应的索引（在排除直流后的数组中）
+    max_idx = np.argmax(relevant_power)
+    # 获取对应频率并计算周期
+    main_frequency = relevant_freqs[max_idx]
+    main_period = 1.0 / main_frequency
     return main_period
 
 def main():
