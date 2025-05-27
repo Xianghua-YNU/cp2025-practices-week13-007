@@ -21,7 +21,7 @@ def load_sunspot_data(url):
     """
     # TODO: 使用np.loadtxt读取数据，只保留第2(年份)和3(太阳黑子数)列
     # [STUDENT_CODE_HERE]
-    data = np.loadtxt(r"C:\Users\35281\Desktop\计算物理\cp2025-practices-week13-007-main\sunspot_data.txt",usecols=(2,3),comments='#')
+    data = np.loadtxt("sunspot_data.txt",usecols=(2,3),comments='#')
     years = data[:,0]
     sunspots = data[:,1]
     return years, sunspots
